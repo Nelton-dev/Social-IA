@@ -1,4 +1,4 @@
-import { motion } from "motion/react";
+import React from "react";
 import { 
   Briefcase, 
   Sparkles, 
@@ -8,10 +8,11 @@ import {
   Twitter, 
   Instagram,
   Copy,
-  Download,
-  ExternalLink,
-  ChevronRight,
-  Info
+  Sliders,
+  Settings2,
+  Lock,
+  Layers,
+  Sparkle
 } from "lucide-react";
 import { Tone, AspectRatioType, ImageSizeType, ModelQualityType } from "../types";
 
@@ -23,35 +24,41 @@ interface ToneSelectorProps {
 }
 
 export function ToneSelector({ currentTone, onChange, disabled }: ToneSelectorProps) {
-  const tonesList: { value: Tone; label: string; description: string; color: string; bg: string; icon: any }[] = [
+  const tonesList = [
     {
-      value: "professional",
+      value: "professional" as Tone,
       label: "Profissional",
-      description: "Conteúdo estruturado, perspicaz e focado em negócios com layouts corporativos.",
-      color: "text-indigo-600 border-indigo-200",
-      bg: "bg-indigo-50",
+      tagline: "Estratégia corporativa",
+      description: "Conteúdo focado nos negócios, estruturado, perspicaz e com escrita polida voltada à credibilidade.",
+      color: "text-indigo-600",
+      accentBg: "bg-indigo-50",
+      borderSelected: "border-indigo-600 ring-indigo-100",
       icon: Briefcase
     },
     {
-      value: "witty",
-      label: "Perspicaz & Divertido",
-      description: "Estruturas inteligentes, ganchos afiados, tom conversacional e ideias criativas.",
-      color: "text-emerald-600 border-emerald-200",
-      bg: "bg-emerald-50",
+      value: "witty" as Tone,
+      label: "Perspicaz & Criativo",
+      tagline: "Engajamento viral",
+      description: "Ganchos afiados, humor inteligente, tom conversacional e analogias surpreendentes de alto alcance.",
+      color: "text-amber-600",
+      accentBg: "bg-amber-50",
+      borderSelected: "border-amber-600 ring-amber-100",
       icon: Sparkles
     },
     {
-      value: "urgent",
-      label: "Urgente & Direto",
-      description: "Alto impacto, urgência baseada em valor comercial e apelos de ação (CTA) fortes.",
-      color: "text-rose-600 border-rose-200",
-      bg: "bg-rose-50",
+      value: "urgent" as Tone,
+      label: "Urgente & Persuasivo",
+      tagline: "Foco em Conversão",
+      description: "Frases de alto impacto emocional, gatilhos de escassez e chamadas comerciais diretas (CTA).",
+      color: "text-red-600",
+      accentBg: "bg-red-50",
+      borderSelected: "border-red-600 ring-red-100",
       icon: Megaphone
     }
   ];
 
   return (
-    <div id="tone-selector" className="grid grid-cols-1 md:grid-cols-3 gap-3">
+    <div id="tone-selector" className="grid grid-cols-1 gap-3">
       {tonesList.map((t) => {
         const Icon = t.icon;
         const isSelected = currentTone === t.value;
@@ -62,24 +69,38 @@ export function ToneSelector({ currentTone, onChange, disabled }: ToneSelectorPr
             type="button"
             disabled={disabled}
             onClick={() => onChange(t.value)}
-            className={`flex flex-col items-start p-4 rounded-xl border-2 text-left transition-all relative overflow-hidden ${
+            className={`group text-left p-4 rounded-xl border transition-all duration-200 relative overflow-hidden flex gap-3.5 items-start ${
               isSelected 
-                ? "border-indigo-600 bg-white shadow-sm ring-1 ring-indigo-600" 
-                : "border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-slate-300"
-            } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+                ? `border-slate-800 bg-white ring-4 ${t.borderSelected} shadow-xs` 
+                : "border-slate-200/80 bg-slate-50/40 hover:bg-slate-50 hover:border-slate-300"
+            } ${disabled ? "opacity-55 cursor-not-allowed" : "cursor-pointer"}`}
           >
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`p-1.5 rounded-lg ${isSelected ? "bg-indigo-600 text-white" : `${t.bg} ${t.color}`}`}>
-                <Icon size={16} />
-              </span>
-              <span className="font-semibold text-slate-800 text-sm md:text-base">{t.label}</span>
-              {isSelected && (
-                <span className="ml-auto text-indigo-600 bg-indigo-50 rounded-full p-0.5">
-                  <Check size={12} strokeWidth={3} />
+            {/* Left Accented Block */}
+            <span className={`p-2.5 rounded-xl shrink-0 transition-transform duration-200 group-hover:scale-105 ${
+              isSelected ? "bg-slate-900 text-white" : `${t.accentBg} ${t.color}`
+            }`}>
+              <Icon size={18} />
+            </span>
+
+            {/* Central Information */}
+            <div className="space-y-0.5 flex-1 pr-6">
+              <div className="flex items-center gap-1.5">
+                <span className="font-semibold text-slate-800 text-sm">{t.label}</span>
+                <span className="text-[10px] bg-slate-100/80 text-slate-500 px-1.5 py-0.5 rounded-md font-medium">
+                  {t.tagline}
                 </span>
-              )}
+              </div>
+              <p className="text-[11px] text-slate-500 leading-relaxed font-normal">
+                {t.description}
+              </p>
             </div>
-            <p className="text-xs text-slate-500 line-clamp-2">{t.description}</p>
+
+            {/* Selected Indicator badge */}
+            {isSelected && (
+              <span className="absolute top-4 right-4 flex items-center justify-center w-5 h-5 bg-slate-900 text-white rounded-full">
+                <Check size={11} strokeWidth={3} />
+              </span>
+            )}
           </button>
         );
       })}
@@ -92,20 +113,20 @@ export function PlatformBranding({ platform }: { platform: "linkedin" | "twitter
   switch (platform) {
     case "linkedin":
       return (
-        <span className="flex items-center justify-center p-2 bg-[#0077b5]/10 text-[#0077b5] rounded-lg">
-          <Linkedin size={20} />
+        <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-tr from-[#005a87] to-[#0077b5] text-white shadow-xs">
+          <Linkedin size={16} />
         </span>
       );
     case "twitter":
       return (
-        <span className="flex items-center justify-center p-2 bg-neutral-950/10 text-neutral-950 rounded-lg">
-          <Twitter size={20} />
+        <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-slate-950 text-white border border-slate-800 shadow-xs">
+          <Twitter size={15} />
         </span>
       );
     case "instagram":
       return (
-        <span className="flex items-center justify-center p-2 bg-gradient-to-tr from-yellow-500 via-red-500 to-purple-600 text-white rounded-lg">
-          <Instagram size={20} />
+        <span className="flex items-center justify-center w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 text-white shadow-xs">
+          <Instagram size={16} />
         </span>
       );
   }
@@ -131,30 +152,49 @@ export function ImageControls({
   onQualityChange,
   disabled
 }: ImageControlsProps) {
+  
+  // Wireframe geometric representation generator
+  const getWireframe = (ratio: AspectRatioType) => {
+    switch (ratio) {
+      case "1:1": return "w-3 h-3 rounded-xs border-2 border-current shrink-0";
+      case "4:3": return "w-3.5 h-2.5 rounded-xs border-2 border-current shrink-0";
+      case "3:4": return "w-2.5 h-3.5 rounded-xs border-2 border-current shrink-0";
+      case "16:9": return "w-4.5 h-2.5 rounded-xs border-2 border-current shrink-0";
+      case "9:16": return "w-2.5 h-4 rounded-xs border-2 border-current shrink-0";
+      case "3:2": return "w-4 h-2.5 rounded-xs border-2 border-current shrink-0";
+      case "2:3": return "w-2.5 h-4 rounded-xs border-2 border-current shrink-0";
+      case "21:9": return "w-5 h-2 rounded-xs border-2 border-current shrink-0";
+      default: return "w-3 h-3 rounded-xs border-2 border-current shrink-0";
+    }
+  };
+
   const ratios: { value: AspectRatioType; label: string; desc: string }[] = [
-    { value: "1:1", label: "1:1", desc: "Quadrado (Feed Meta)" },
-    { value: "4:3", label: "4:3", desc: "Tablet Paisagem" },
-    { value: "3:4", label: "3:4", desc: "Retrato Post" },
-    { value: "16:9", label: "16:9", desc: "Widescreen (Banner X / LinkedIn)" },
-    { value: "9:16", label: "9:16", desc: "Story / Reel (Celular)" },
-    { value: "3:2", label: "3:2", desc: "Foto tradicional" },
-    { value: "2:3", label: "2:3", desc: "Aspecto editorial" },
-    { value: "21:9", label: "21:9", desc: "Cinematográfico ultra-amplo" }
+    { value: "1:1", label: "1:1", desc: "Feed Quadrado" },
+    { value: "4:3", label: "4:3", desc: "Tablet / Carrossel" },
+    { value: "3:4", label: "3:4", desc: "Feed Retrato" },
+    { value: "16:9", label: "16:9", desc: "Widescreen / Banner" },
+    { value: "9:16", label: "9:16", desc: "Story / Reels" },
+    { value: "3:2", label: "3:2", desc: "Foto Clássica" },
+    { value: "2:3", label: "2:3", desc: "Capa / Editorial" },
+    { value: "21:9", label: "21:9", desc: "Ultra-Amplo" }
   ];
 
   const sizes: { value: ImageSizeType; label: string; pixels: string }[] = [
-    { value: "1K", label: "1K Padrão", pixels: "1024 x 1024" },
-    { value: "2K", label: "2K QuadHD", pixels: "2048 x 2048" },
-    { value: "4K", label: "4K UHD Estúdio", pixels: "4096 x 4096" }
+    { value: "1K", label: "1K SD", pixels: "1024 px" },
+    { value: "2K", label: "2K HD", pixels: "2048 px" },
+    { value: "4K", label: "4K UHD", pixels: "4096 px" }
   ];
 
   return (
     <div id="image-controls-panel" className="space-y-4">
-      {/* Model Quality Setup Block */}
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-xs font-bold text-slate-500 tracking-wider uppercase">Qualidade do Modelo</label>
-          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider">Gemini Engine</span>
+      {/* Model Selector Card Style */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Estilo de Motor Visual</label>
+          <span className="text-[8px] bg-indigo-50 text-indigo-600 px-1.5 py-0.5 rounded font-bold uppercase tracking-wider flex items-center gap-1">
+            <Sparkle size={8} fill="currentColor" />
+            <span>Gemini Image FX</span>
+          </span>
         </div>
         <div className="grid grid-cols-2 gap-2">
           <button
@@ -162,80 +202,89 @@ export function ImageControls({
             type="button"
             disabled={disabled}
             onClick={() => onQualityChange("fast")}
-            className={`px-3 py-2 rounded-lg text-xs font-semibold border text-center transition-all cursor-pointer ${
+            className={`p-2.5 rounded-xl text-xs font-semibold border text-left transition-all relative ${
               quality === "fast"
-                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-            }`}
+                ? "bg-slate-900 border-slate-950 text-white shadow-md shadow-slate-100"
+                : "bg-slate-50/50 text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+            } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
-            <div>Geração Rápida</div>
-            <div className="text-[10px] opacity-75 font-normal">3.1-flash-image</div>
+            <div className="font-semibold text-[11px]">Renderizador Flash</div>
+            <p className="text-[9px] opacity-80 mt-0.5 font-normal">Velocidade ultra rápida</p>
           </button>
           <button
             id="quality-studio"
             type="button"
             disabled={disabled}
             onClick={() => onQualityChange("studio")}
-            className={`px-3 py-2 rounded-lg text-xs font-semibold border text-center transition-all cursor-pointer ${
+            className={`p-2.5 rounded-xl text-xs font-semibold border text-left transition-all relative ${
               quality === "studio"
-                ? "bg-indigo-600 border-indigo-600 text-white shadow-sm ring-1 ring-indigo-400"
-                : "bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100"
-            }`}
+                ? "bg-gradient-to-br from-indigo-900 to-indigo-950 border-indigo-950 text-white shadow-md shadow-indigo-100 ring-2 ring-indigo-500/10"
+                : "bg-slate-50/50 text-slate-600 border-slate-200 hover:bg-slate-50 hover:border-slate-300"
+            } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
           >
-            <div className="flex items-center justify-center gap-1">
+            <div className="font-semibold text-[11px] flex items-center justify-between gap-1">
               <span>Mestre de Estúdio</span>
-              <span className="px-1 text-[9px] bg-amber-500 text-white rounded font-bold uppercase tracking-wider">Pro</span>
+              <span className="text-[7px] bg-amber-400 text-amber-950 px-1 py-0.2 rounded font-bold uppercase">PRO</span>
             </div>
-            <div className="text-[10px] opacity-75 font-normal">3-pro-image</div>
+            <p className="text-[9px] opacity-80 mt-0.5 font-normal">Filtro de refinamento estético</p>
           </button>
         </div>
       </div>
 
-      {/* Aspect Ratio Selector */}
-      <div>
-        <label className="block text-xs font-bold text-slate-500 tracking-wider uppercase mb-2">Proporção da Imagem (Quadro Ideal)</label>
-        <div className="grid grid-cols-4 gap-1.5 font-sans">
-          {ratios.map((r) => (
-            <button
-              key={r.value}
-              id={`ratio-${r.value.replace(":", "-")}`}
-              type="button"
-              disabled={disabled}
-              onClick={() => onRatioChange(r.value)}
-              title={`${r.label} - ${r.desc}`}
-              className={`py-1.5 px-1 rounded-lg text-xs font-semibold border text-center transition-all cursor-pointer ${
-                aspectRatio === r.value
-                  ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              {r.label}
-            </button>
-          ))}
+      {/* Aspect Ratio Selector (Mini Wireframes) */}
+      <div className="space-y-2">
+        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Ajuste de Proporção (Quadro)</label>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 font-sans">
+          {ratios.map((r) => {
+            const isSelected = aspectRatio === r.value;
+            return (
+              <button
+                key={r.value}
+                id={`ratio-${r.value.replace(":", "-")}`}
+                type="button"
+                disabled={disabled}
+                onClick={() => onRatioChange(r.value)}
+                title={`${r.label} - ${r.desc}`}
+                className={`py-2 px-2.5 rounded-xl text-xs font-semibold border transition-all flex items-center gap-2 hover:scale-[1.02] active:scale-95 ${
+                  isSelected
+                    ? "bg-slate-900 text-white border-slate-950 shadow-xs"
+                    : "bg-white text-slate-600 border-slate-200/80 hover:bg-slate-50 hover:border-slate-300"
+                } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              >
+                <span className={isSelected ? "text-indigo-400" : "text-slate-400"}>
+                  {getWireframe(r.value)}
+                </span>
+                <span className="text-[11px] font-medium font-mono">{r.label}</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Output Size Selector */}
-      <div>
-        <label className="block text-xs font-bold text-slate-500 tracking-wider uppercase mb-2">Resolução Alvo</label>
+      <div className="space-y-2">
+        <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Resolução Nativa</label>
         <div className="grid grid-cols-3 gap-2">
-          {sizes.map((s) => (
-            <button
-              key={s.value}
-              id={`size-${s.value}`}
-              type="button"
-              disabled={disabled}
-              onClick={() => onSizeChange(s.value)}
-              className={`p-2 rounded-lg border text-left transition-all cursor-pointer ${
-                size === s.value
-                  ? "bg-indigo-600 text-white border-indigo-600 shadow-sm animate-pulse"
-                  : "bg-white text-slate-600 border-slate-200 hover:bg-slate-50"
-              }`}
-            >
-              <div className="text-xs font-bold">{s.value}</div>
-              <div className="text-[9px] opacity-75">{s.pixels}</div>
-            </button>
-          ))}
+          {sizes.map((s) => {
+            const isSelected = size === s.value;
+            return (
+              <button
+                key={s.value}
+                id={`size-${s.value}`}
+                type="button"
+                disabled={disabled}
+                onClick={() => onSizeChange(s.value)}
+                className={`p-2 rounded-xl border text-center transition-all flex flex-col items-center justify-center hover:scale-[1.01] ${
+                  isSelected
+                    ? "bg-slate-900 text-white border-slate-950 shadow-sm"
+                    : "bg-white text-slate-600 border-slate-200/80 hover:bg-slate-50 hover:border-slate-300"
+                } ${disabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer"}`}
+              >
+                <div className="text-[11px] font-bold">{s.label}</div>
+                <div className="text-[8px] font-medium opacity-70 tracking-tight mt-0.5">{s.pixels}</div>
+              </button>
+            );
+          })}
         </div>
       </div>
     </div>
@@ -264,10 +313,11 @@ export function ContentTools({
       id="btn-copy-post"
       type="button"
       onClick={handleCopy}
-      className="text-indigo-600 text-xs font-bold hover:underline transition-all cursor-pointer p-1 rounded hover:bg-indigo-50"
-      title="Copiar conteúdo do post"
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 border border-slate-950 text-white hover:bg-slate-800 transition-all cursor-pointer rounded-lg text-xs font-semibold shadow-xs"
+      title="Copiar texto completo"
     >
-      <span>Copiar Texto</span>
+      <Copy size={12} />
+      <span>Copiar Copia</span>
     </button>
   );
 }
