@@ -1,0 +1,6 @@
+{
+  "name": "Social Media Content Generator",
+  "description": "Generate platform-tailored text posts and optimized images for LinkedIn, Twitter/X, and Instagram based on concepts, tones, sizes, and custom aspect ratios.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
